@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
+const inputCheck = require('./utils/inputCheck');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -19,36 +20,78 @@ const db = mysql.createConnection(
 );
 
 // Get all novels
-db.query(`SELECT * FROM novels`, (err, rows) => {
-  console.log(rows);
+app.get('/api/novels', (req, res) => {
+  const sql = `SELECT * FROM novels`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: rows
+    });
+  });
 });
 
 // Get a single novel
-//db.query(`SELECT * FROM novels WHERE id = 2`, (err, rows) => {
-//  if (err) {
-//    console.log(err);
-//  }
-//  console.log(rows);
-//});
+app.get('/api/novel/:id', (req, res) => {
+  const sql = `SELECT * FROM novels WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: row
+    });
+  });
+});
 
 // Delete a novel
-//db.query(`DELETE FROM novels WHERE id = ?`, 2, (err, result) => {
-//  if (err) {
-//    console.log(err);
-//  }
-//  console.log(result);
-//});
+app.delete('/api/novel/:id', (req, res) => {
+  const sql = `DELETE FROM novels WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.statusMessage(400).json({ error: res.message });
+    } else if (!result.affectedRows) {
+      res.json({ message: 'Novel not found' });
+    } else {
+      res.json({
+        message: 'Deleted',
+        changes: result.affectedRows,
+        id: req.params.id
+      });
+    }
+  });
+});
 
 // Add a novel
-//const sql = `INSERT INTO novels (id, title, year, complete)
-//              VALUES (?,?,?,?)`;
-//const params = [2, 'Pride and Prejudice', 1813, 1]  ;
-//db.query(sql, params, (err, result) => {
-//  if (err) {
-//    console.log(err);
-//  }
-//  console.log(result);
-//});            
+app.post('/api/novel', ({ body }, res) => {
+  const errors = inputCheck(body, 'title', 'year', 'complete');
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sql = `INSERT INTO novels (title, year, complete)
+              VALUES (?,?,?)`;
+  const params = [body.title, body.year, body.complete];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: body
+    });
+  });
+});
 
 app.use((req, res) => {
   res.status(404).end();

@@ -51,6 +51,38 @@ app.get('/api/novel/:id', (req, res) => {
   });
 });
 
+// Get all characters
+app.get('/api/characters', (req, res) => {
+  const sql = `SELECT * FROM characters`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ 
+      message: 'Success',
+      data: rows
+    });
+  });
+});
+
+// Get all characters from a specific novel by novel_id
+app.get('/api/characters/:novelid', (req, res) => {
+  const sql = `SELECT * FROM characters WHERE novel_id = ?`;
+  const params = [req.params.novelid];
+
+  db.query(sql, params, (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: rows
+    });
+  });
+});
+
 // Delete a novel
 app.delete('/api/novel/:id', (req, res) => {
   const sql = `DELETE FROM novels WHERE id = ?`;

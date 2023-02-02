@@ -53,7 +53,11 @@ app.get('/api/novel/:id', (req, res) => {
 
 // Get all characters
 app.get('/api/characters', (req, res) => {
-  const sql = `SELECT * FROM characters`;
+  const sql = `SELECT characters.*, novels.title 
+                   AS novel_title
+                 FROM characters
+            LEFT JOIN novels 
+                   ON characters.novel_id = novels.id`;
   db.query(sql, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -68,7 +72,12 @@ app.get('/api/characters', (req, res) => {
 
 // Get all characters from a specific novel by novel_id
 app.get('/api/characters/:novelid', (req, res) => {
-  const sql = `SELECT * FROM characters WHERE novel_id = ?`;
+  const sql = `SELECT characters.*, novels.title 
+                   AS novel_title
+                 FROM characters
+            LEFT JOIN novels 
+                   ON characters.novel_id = novels.id 
+                WHERE novel_id = ?`;
   const params = [req.params.novelid];
 
   db.query(sql, params, (err, rows) => {

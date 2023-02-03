@@ -70,8 +70,25 @@ app.get('/api/characters', (req, res) => {
   });
 });
 
+// Get a single character by ID
+app.get('/api/characters/:id', (req, res) => {
+  const sql = `SELECT * FROM characters WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: row
+    });
+  });
+});
+
 // Get all characters from a specific novel by novel_id
-app.get('/api/characters/:novelid', (req, res) => {
+app.get('/api/characters-from-novel/:novelid', (req, res) => {
   const sql = `SELECT characters.*, novels.title 
                    AS novel_title
                  FROM characters
@@ -131,6 +148,29 @@ app.post('/api/novel', ({ body }, res) => {
       message: 'Success',
       data: body
     });
+  });
+});
+
+//Update a character's description
+app.put('/api/characters/:id', (req, res) => {
+  const sql = `UPDATE characters SET description = ?
+                WHERE id = ?`;
+  const params = [req.body.description, req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      // Check if a character is found with ID
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Character not found'
+      });
+    } else {
+      res.json({
+        message: 'Success',
+        data: req.body,
+        changes: result.affectedRows
+      });
+    }
   });
 });
 

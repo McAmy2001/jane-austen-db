@@ -12,6 +12,7 @@ CREATE TABLE characters (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(15) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
+  description TEXT,
   novel_id INTEGER,
   CONSTRAINT fk_novel FOREIGN KEY (novel_id) REFERENCES novels(id) ON DELETE SET NULL
 );

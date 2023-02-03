@@ -10,17 +10,17 @@ VALUES
   ('The Watsons', 1804, 0),
   ('Sanditon', 1817, 0);
 
-INSERT INTO characters (first_name, last_name, novel_id)
+INSERT INTO characters (first_name, last_name, description, novel_id)
 VALUES
-  ('Elizabeth', 'Bennett', 2),
-  ('Fitzwilliam', 'Darcy', 2),
-  ('Anne', 'Elliot', 6),
-  ('Frederick', 'Wentworth', 6),
-  ('Elinor', 'Dashwood', 1),
-  ('Marianne', 'Dashwood', 1),
-  ('Edward', 'Ferras', 1),
-  ('Christopher', 'Brandon', 1),
-  ('Fanny', 'Price', 3),
-  ('Edward', 'Bertram', 3),
-  ('Emma', 'Woodhouse', 4),
-  ('George', 'Knightley', 4);
+  ('Elizabeth', 'Bennett', 'Witty, lovely female protagonist of P & P', 2),
+  ('Fitzwilliam', 'Darcy', 'Tall, handsome, rich male protagonist of P & P', 2),
+  ('Anne', 'Elliot', 'Probably my favorite female JA character' ,6),
+  ('Frederick', 'Wentworth', 'The naval hottie brother of the renters of Kellynch',6),
+  ('Elinor', 'Dashwood', 'Sense',1),
+  ('Marianne', 'Dashwood', 'Sensibility',1),
+  ('Edward', 'Ferras', 'Loves him some Sense',1),
+  ('Christopher', 'Brandon', 'Loves him some Sensibility', 1),
+  ('Fanny', 'Price', 'Quiet and kind', 3),
+  ('Edward', 'Bertram', 'Meh', 3),
+  ('Emma', 'Woodhouse', 'Rich and beautiful busybody', 4),
+  ('George', 'Knightley', 'Trusty neighbor', 4);

@@ -51,13 +51,13 @@ app.get('/api/novel/:id', (req, res) => {
   });
 });
 
-// Get all characters
-app.get('/api/characters', (req, res) => {
-  const sql = `SELECT characters.*, novels.title 
+// Get all female characters
+app.get('/api/female-characters', (req, res) => {
+  const sql = `SELECT fc.*, novels.title 
                    AS novel_title
-                 FROM characters
+                 FROM female_characters fc
             LEFT JOIN novels 
-                   ON characters.novel_id = novels.id`;
+                   ON fc.novel_id = novels.id`;
   db.query(sql, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -70,9 +70,45 @@ app.get('/api/characters', (req, res) => {
   });
 });
 
-// Get a single character by ID
-app.get('/api/characters/:id', (req, res) => {
-  const sql = `SELECT * FROM characters WHERE id = ?`;
+// Get all male characters
+app.get('/api/male-characters', (req, res) => {
+  const sql = `SELECT mc.*, novels.title 
+                   AS novel_title
+                 FROM male_characters mc
+            LEFT JOIN novels 
+                   ON mc.novel_id = novels.id`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ 
+      message: 'Success',
+      data: rows
+    });
+  });
+});
+
+// Get a single female character by ID
+app.get('/api/female-character/:id', (req, res) => {
+  const sql = `SELECT * FROM female_characters WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: row
+    });
+  });
+});
+
+// Get a single male character by ID
+app.get('/api/male-character/:id', (req, res) => {
+  const sql = `SELECT * FROM male_characters WHERE id = ?`;
   const params = [req.params.id];
 
   db.query(sql, params, (err, row) => {
@@ -89,12 +125,17 @@ app.get('/api/characters/:id', (req, res) => {
 
 // Get all characters from a specific novel by novel_id
 app.get('/api/characters-from-novel/:novelid', (req, res) => {
-  const sql = `SELECT characters.*, novels.title 
+  /* const sql = `SELECT characters.*, novels.title 
                    AS novel_title
                  FROM characters
             LEFT JOIN novels 
                    ON characters.novel_id = novels.id 
-                WHERE novel_id = ?`;
+                WHERE novel_id = ?`; */
+  const sql =  `SELECT first_name, last_name, n.title 
+                  FROM characters c 
+             LEFT JOIN novels n 
+                    ON c.novel_id = n.id
+                 WHERE novel_id = ?`             
   const params = [req.params.novelid];
 
   db.query(sql, params, (err, rows) => {
@@ -152,7 +193,7 @@ app.post('/api/novel', ({ body }, res) => {
 });
 
 //Update a character's description
-app.put('/api/characters/:id', (req, res) => {
+app.put('/api/character/:id', (req, res) => {
   const sql = `UPDATE characters SET description = ?
                 WHERE id = ?`;
   const params = [req.body.description, req.params.id];

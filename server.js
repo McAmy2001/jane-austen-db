@@ -123,16 +123,31 @@ app.get('/api/male-character/:id', (req, res) => {
   });
 });
 
-// Get all characters from a specific novel by novel_id
-app.get('/api/characters-from-novel/:novelid', (req, res) => {
-  /* const sql = `SELECT characters.*, novels.title 
-                   AS novel_title
-                 FROM characters
-            LEFT JOIN novels 
-                   ON characters.novel_id = novels.id 
-                WHERE novel_id = ?`; */
+// Get all female characters from a specific novel by novel_id
+app.get('/api/female-characters-from-novel/:novelid', (req, res) => {
   const sql =  `SELECT first_name, last_name, n.title 
-                  FROM characters c 
+                  FROM female_characters c 
+             LEFT JOIN novels n 
+                    ON c.novel_id = n.id
+                 WHERE novel_id = ?`             
+  const params = [req.params.novelid];
+
+  db.query(sql, params, (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'Success',
+      data: rows
+    });
+  });
+});
+
+// Get all male characters from a specific novel by novel_id
+app.get('/api/male-characters-from-novel/:novelid', (req, res) => {
+  const sql =  `SELECT first_name, last_name, n.title 
+                  FROM male_characters c 
              LEFT JOIN novels n 
                     ON c.novel_id = n.id
                  WHERE novel_id = ?`             
@@ -192,9 +207,32 @@ app.post('/api/novel', ({ body }, res) => {
   });
 });
 
-//Update a character's description
-app.put('/api/character/:id', (req, res) => {
-  const sql = `UPDATE characters SET description = ?
+//Update a female character's description
+app.put('/api/female-character/:id', (req, res) => {
+  const sql = `UPDATE female_characters SET description = ?
+                WHERE id = ?`;
+  const params = [req.body.description, req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      // Check if a character is found with ID
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Character not found'
+      });
+    } else {
+      res.json({
+        message: 'Success',
+        data: req.body,
+        changes: result.affectedRows
+      });
+    }
+  });
+});
+
+//Update a male character's description
+app.put('/api/male-character/:id', (req, res) => {
+  const sql = `UPDATE male_characters SET description = ?
                 WHERE id = ?`;
   const params = [req.body.description, req.params.id];
   db.query(sql, params, (err, result) => {
